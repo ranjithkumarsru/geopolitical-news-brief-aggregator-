@@ -1,0 +1,56 @@
+name: Daily Geopolitical Intelligence Briefing
+
+on:
+  schedule:
+    # Run every morning at 06:00 UTC (11:30 AM IST / 01:00 AM EST)
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  run-intelligence-brief:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Test Suite
+        run: |
+          pytest -v
+
+      - name: Execute Geopolitical Aggregation & Gemini Analysis
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-2.5-flash
+          MAX_ARTICLES_PER_FEED: 10
+        run: |
+          python -m src.pipeline
+
+      - name: Upload Daily Brief Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: geopolitical-briefs
+          path: briefs/
+          retention-days: 30
+
+      - name: Commit and Push Updated Intelligence Briefs
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Geopolitical Brief Bot"
+          git add briefs/
+          # Commit only if changes exist
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-generate Daily Geopolitical Intelligence Brief [skip ci]" && git push)

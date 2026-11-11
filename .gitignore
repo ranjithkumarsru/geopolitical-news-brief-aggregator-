@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments and Secrets (Never commit credentials)
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# SQLite Databases & temporary data
+data/*.db
+data/*.sqlite3
+data/*.db-journal
+
+# Python virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Streamlit local config & cache
+.streamlit/
+.streamlit/secrets.toml
+
+# IDEs & Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Generated files
+.DS_Store
+Thumbs.db
